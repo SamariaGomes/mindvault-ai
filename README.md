@@ -1,20 +1,20 @@
-# 🛡️ MindVault AI — Diário Híbrido de Saúde Mental
+# 🛡️ MindVault AI — Hybrid Mental Health Journal
 
-**Demo ao vivo:** [https://mindvault-hybrid-ai.web.app](https://mindvault-hybrid-ai.web.app)
+**Live Demo:** [https://mindvault-hybrid-ai.web.app](https://mindvault-hybrid-ai.web.app)
 
-O **MindVault AI** é uma aplicação web híbrida de saúde mental construída com **Firebase AI Logic**, **React** e **TypeScript**, projetada para equilibrar **privacidade absoluta** com **síntese clínica inteligente**.
+**MindVault AI** is a privacy-first hybrid mental health web application built for **#BuildHybridAI**, powered by **Firebase AI Logic**, **React**, and **TypeScript**. It solves a critical barrier in digital mental health: enabling deep AI-assisted therapeutic insights without ever exposing raw, sensitive journal entries to the cloud.
 
-## 🏗️ Arquitetura Híbrida
+## 🏗️ Hybrid AI Architecture
 
-* **Cofre Local Privado (`InferenceMode.PREFER_ON_DEVICE`):**
-  * Os relatos brutos do diário nunca saem do dispositivo do usuário (armazenados exclusivamente no `localStorage`).
-  * A análise emocional imediata e a resposta empática são processadas localmente via Gemini Nano (com fallback seguro em nuvem quando o navegador não possui modelo local ativo) e funcionam mesmo **offline**.
-* **Síntese Clínica em Nuvem (`InferenceMode.PREFER_IN_CLOUD`):**
-  * Apenas metadados estritamente anonimizados (`mood_score`, `emotions`, `triggers`, `cognitive_distortion`) são sincronizados com o **Cloud Firestore** sob autenticação anônima protegida pelo **Firebase App Check (reCAPTCHA v3)**.
-  * O **Gemini Flash** (`gemini-3.8-flash` com fallback automático para `gemini-3.5-flash-lite`) consolida os padrões longitudinais para gerar um resumo estruturado para sessões de terapia.
+* **Private Local Vault (`InferenceMode.PREFER_ON_DEVICE`):**
+  * Raw journal entries never leave the user's device and are stored strictly in `localStorage`.
+  * Immediate empathetic reflection and structured emotional tagging run locally on Chrome via **Gemini Nano** (with automatic cloud fallback when on-device hardware is unavailable) and work seamlessly **offline**.
+* **Cloud Clinical Synthesis (`InferenceMode.PREFER_IN_CLOUD`):**
+  * Only strictly anonymized metadata (`mood_score`, `emotions`, `triggers`, `cognitive_distortion`) is synced to **Cloud Firestore**, secured by **Firebase Anonymous Authentication** and **Firebase App Check (reCAPTCHA v3)**.
+  * **Gemini Flash** (`gemini-3.8-flash` with `gemini-3.5-flash-lite` fallback) aggregates longitudinal patterns to generate a structured clinical summary for therapy sessions.
 
-## 🚀 Como executar localmente
+## 🚀 Running Locally
 
-1. Clone o repositório e instale as dependências:
+1. Clone the repository and install dependencies:
    ```bash
    npm install
