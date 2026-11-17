@@ -54,11 +54,43 @@ export function App() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setLocalEntries(parsed);
-        if (parsed.length > 0) {
-          setLastSavedEntry(parsed[0]);
+        if (Array.isArray(parsed)) {
+          // Normaliza entradas antigas e novas para nunca quebrar
+          const validEntries: LocalEntry[] = parsed
+            .filter((item: any) => item && typeof item.text === "string")
+            .map((item: any) => ({
+              id: item.id || crypto.randomUUID(),
+              text: item.text,
+              createdAt: item.createdAt || item.timestamp || new Date().toISOString(),
+              analysis: {
+                empathy_reply:
+                  item.analysis?.empathy_reply ||
+                  item.empathy_reply ||
+                  "Thank you for sharing your thoughts privately.",
+                mood_score: Number(item.analysis?.mood_score ?? item.mood_score ?? 5),
+                emotions: Array.isArray(item.analysis?.emotions)
+                  ? item.analysis.emotions
+                  : Array.isArray(item.emotions)
+                  ? item.emotions
+                  : [],
+                triggers: Array.isArray(item.analysis?.triggers)
+                  ? item.analysis.triggers
+                  : Array.isArray(item.triggers)
+                  ? item.triggers
+                  : [],
+                cognitive_distortion:
+                  item.analysis?.cognitive_distortion ?? item.cognitive_distortion ?? null,
+                source: item.analysis?.source || "on-device",
+              },
+            }));
+
+          setLocalEntries(validEntries);
+          if (validEntries.length > 0) {
+            setLastSavedEntry(validEntries[0]);
+          }
         }
       } catch {
+        localStorage.removeItem("mindvault_private_entries");
         setLocalEntries([]);
       }
     }
@@ -138,10 +170,10 @@ export function App() {
 
       if (logs.length === 0 && localEntries.length > 0) {
         logs = localEntries.map((entry) => ({
-          mood_score: entry.analysis.mood_score,
-          emotions: entry.analysis.emotions,
-          triggers: entry.analysis.triggers,
-          cognitive_distortion: entry.analysis.cognitive_distortion,
+          mood_score: entry.analysis?.mood_score ?? 5,
+          emotions: entry.analysis?.emotions ?? [],
+          triggers: entry.analysis?.triggers ?? [],
+          cognitive_distortion: entry.analysis?.cognitive_distortion ?? null,
           createdAt: entry.createdAt,
         }));
       }
@@ -205,7 +237,7 @@ export function App() {
   const averageMood =
     localEntries.length > 0
       ? (
-          localEntries.reduce((acc, item) => acc + (item.analysis.mood_score || 5), 0) /
+          localEntries.reduce((acc, item) => acc + (item.analysis?.mood_score ?? 5), 0) /
           localEntries.length
         ).toFixed(1)
       : "—";
@@ -394,7 +426,7 @@ export function App() {
               </form>
 
               {/* Empathetic AI Reflection Result */}
-              {lastSavedEntry && (
+              {lastSavedEntry && lastSavedEntry.analysis && (
                 <div className="mt-6 pt-5 border-t border-slate-100 space-y-4">
                   <div className="rounded-2xl bg-gradient-to-br from-indigo-50/80 to-violet-50/60 border border-indigo-100 p-4">
                     <div className="flex items-center justify-between mb-2">
@@ -473,12 +505,12 @@ export function App() {
                       <div className="flex items-center justify-between text-xs text-slate-500">
                         <span>{new Date(entry.createdAt).toLocaleString()}</span>
                         <span className="px-2 py-0.5 rounded-full font-semibold bg-indigo-50 text-indigo-700">
-                          Mood: {entry.analysis.mood_score}/10
+                          Mood: {entry.analysis?.mood_score ?? 5}/10
                         </span>
                       </div>
                       <p className="text-sm text-slate-700">{entry.text}</p>
                       <div className="flex flex-wrap gap-1.5">
-                        {entry.analysis.emotions.map((em, idx) => (
+                        {(entry.analysis?.emotions ?? []).map((em, idx) => (
                           <span
                             key={idx}
                             className="text-[11px] px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600"
